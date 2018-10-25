@@ -1,3 +1,10 @@
+<%
+  show_audit_info_column = defined?(AppConfig[:staff_mode_search][:show_audit_info_column]) ?
+                               AppConfig[:staff_mode_search][:show_audit_info_column] : true
+  show_context_column = defined?(AppConfig[:staff_mode_search][:show_context_column]) ?
+                            AppConfig[:staff_mode_search][:show_context_column] : true
+%>
+
 <% if @search_data.results? %>
   <% add_identifier_column if show_identifier_column? %>
   <%= render_aspace_partial :partial => "shared/pagination_summary" %>
@@ -21,7 +28,7 @@
           <%= link_to title_column_header_label, build_search_params("sort" => @search_data.sort_filter_for("title_sort")) %>
         </th>
       <% end %>
-      <% if show_context_column? %>
+      <% if show_context_column? and show_context_column %>
         <th>
           <%= context_column_header_label %>
         </th>
@@ -42,7 +49,9 @@
           </th>
         <% end %>
       <% end %>
-      <th class="col audit-info"></th>
+      <% if show_audit_info_column %>
+        <th class="col audit-info"></th>
+      <% end %>
       <% if !params[:linker] || params[:linker] === 'false' %>
         <th class="col actions"><!-- actions --></th>
       <% end %>
@@ -82,7 +91,7 @@
           <%=  clean_mixed_content(result["title"]).html_safe || clean_mixed_content(result['display_string']).html_safe %>
           </td>
         <% end %>
-        <% if show_context_column? %>
+        <% if show_context_column? and show_context_column %>
           <td>
             <%= render_aspace_partial :partial => "search/context", :locals => {:result => result} %>
           </td>
@@ -97,9 +106,11 @@
             <td><%= col.value_for(result) %></td>
           <% end %>
         <% end %>
-        <td>
-          <%= display_audit_info(result, :format => 'compact') %>
-        </td>
+        <% if show_audit_info_column %>
+          <td>
+            <%= display_audit_info(result, :format => 'compact') %>
+          </td>
+        <% end %>
         <% if !params[:linker] || params[:linker] === 'false' %>
           <td class="table-record-actions">
             <% if not deleted %>
